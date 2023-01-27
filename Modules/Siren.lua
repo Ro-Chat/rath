@@ -1,3 +1,5 @@
+local PingValue = 0
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -7,11 +9,12 @@ local Remote = workspace:WaitForChild("Remote")
 local toggleSiren = Remote:WaitForChild("toggleSiren")
 local sirenToggleScript = toggleSiren:WaitForChild("sirenToggleScript")
 local Prison_ITEMS = workspace:WaitForChild("Prison_ITEMS")
+local PingStat = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]
+
 
 
 local sirenLib = {
     Locked = false,
-    RemoteCounter = 0,
     Disabled = {},
 
     GetSound = function()
@@ -104,25 +107,40 @@ local sirenLib = {
     BreakJoints = function(self, Model)
         for _, Weld in next, Model:GetDescendants() do
             if Weld:IsA("JointInstance") then
-                table.insert(self.Disabled, Weld)
+                self:Disable(Weld)
             end
         end
     end,
     Disable = function(self, instance)
         local stop = false
+
         task.delay(1, function()
             stop = true
         end)
+
+        local Finished = true
+
         local DisableConnection; DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
             if not instance or instance.Enabled == false or stop then
                 DisableConnection:Disconnect()
                 return
             end
-            if sirenToggleScript.Disabled then
-                for _ = 1, 2 do
-                    RunService.Stepped:Wait()
-                    if not instance or instance.Enabled == false or stop then break end
+            if not sirenToggleScript.Enabled and Finished then
+                Finished = false
+                -- task.wait(0.1)
+                -- sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
+                for _ = 1, 4 do
+                    -- task.wait(PingValue / 10000)
+                    if _ % 3 == 0 then
+                        task.wait(0.6)
+                    end
+                    if not instance or not instance.Enabled or stop then break end
+                    if sirenToggleScript.Enabled then
+                        sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
+                    end
                     coroutine.wrap(function()
+                        -- task.wait(0.02)
+                        -- if not instance.Enabled then return end
                         toggleSiren:FireServer({
                             Part1 = {
                                 Part_Weld = true,
@@ -134,8 +152,14 @@ local sirenLib = {
                                 Sound = self.GetSound()
                             }
                         })
+
+                        if _ % 2 == 0 then
+                            Finished = true
+                        end
+
                     end)()
                 end
+                -- Finished = true
             end
         end)
     end
@@ -144,13 +168,17 @@ local sirenLib = {
 sirenLib.DisableQueue = coroutine.create(function()
     while true do task.wait()
         for i, instance in next, sirenLib.Disabled do
-            if i % 5 == 0 then task.wait(0.5) end
+            if i % 5 == 0 then task.wait(0.2) end
             if instance then
                 task.spawn(sirenLib.Disable, sirenLib, instance)
             end
             table.remove(sirenLib.Disabled, i)
         end
     end
+end)
+
+RunService.Heartbeat:Connect(function()
+    PingValue = PingStat:GetValue()
 end)
 
 if sirenLib:Lock(sirenToggleScript) then

@@ -27,7 +27,9 @@ return function(Release)
         Rank = 1,
         Description = "Changes the prefix used for commands.",
         Function = function(plr, prefix)
-            print(prefix)
+            if not prefix then
+                return
+            end
             Admin.Admins[plr].Prefix = prefix
         end
     })
@@ -58,6 +60,20 @@ return function(Release)
                 Siren:Disable(RHip)
                 Siren:Disable(LHip)
 
+            end
+        end
+    })
+
+    Admin:AddCommand({
+        Name = {"rroot", "noroot"},
+        Rank = 1,
+        Description = "Disables the players movement",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                local Character = Player.Character
+                local HRPart = Character and Character:FindFirstChild("HumanoidRootPart")
+
+                Siren:Disable(HRPart:FindFirstChildOfClass("JointInstance"))
             end
         end
     })
@@ -108,12 +124,12 @@ return function(Release)
         Rank = 1,
         Description = "Removes the player's hat.",
         Function = function(plr, name)
-            for i,v in next, Admin.GetPlayers(plr, name) do
-                for i,v in next, v.Character:GetChildren() do
-                  if v:IsA("Accessory") then
-                      for i,v in next, v:GetDescendants() do
-                        if v:IsA("Weld") then
-                          Siren:Disable(v)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                for _, Child in next, Player.Character:GetChildren() do
+                  if Child:IsA("Accessory") then
+                      for _, Weld in next, Child:GetDescendants() do
+                        if Weld:IsA("JointInstance") then
+                          Siren:Disable(Weld)
                         end
                       end
                   end
