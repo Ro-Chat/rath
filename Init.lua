@@ -18,6 +18,59 @@ return function(Release)
     local Admin = Import("Admin")
     local Siren = Import("Siren")
 
+    local GunSystem = Import("GunSystem")
+    local CarSystem = Import("CarSystem")
+
+    ------------ Tables ------------
+
+    local Loop = {
+        Kill = {},
+        Bean = {},
+
+    }
+
+    ------------ Gun System ------------
+    
+    GunSystem:Add("Disable", function(Data)
+        local Shot = Data.Shot
+        local Character = Shot and Shot.Character
+
+        local HRPart = Character and Character:FindFirstChild("HumanoidRootPart")
+        local RootJoint = HRPart and HRPart:FindFirstChild("RootJoint")
+
+        Siren:Disable(RootJoint)
+    end)
+
+    GunSystem:Add("Oneshot", function(Data)
+        local Shot = Data.Shot
+        local Character = Shot and Shot.Character
+
+        if Character:FindFirstChild("Humanoid") and Character.Humanoid.Health == 0 then return end
+
+        local Torso = Character and Character:FindFirstChild("Torso")
+        local Neck = Torso and Torso:WaitForChild("Neck")
+
+        Siren:Disable(Neck)
+    end)
+
+    GunSystem:Add("Hostile", function(Data)
+        local Shot = Data.Shot
+        local Status = Shot and Shot:FindFirstChild("Status")
+
+        if Status.isHostile.Value then return end
+
+        Siren:Bool(Status.isHostile, true)
+    end)
+
+    GunSystem:Add("Innocent", function(Data)
+        local Shot = Data.Shot
+        local Status = Shot and Shot.Status
+
+        if not Status.isHostile.Value then return end
+
+        Siren:Bool(Status.isHostile, false)
+    end)
+
     ------------ Commands ------------
 
     Admin:SetRank(game.Players.LocalPlayer, math.huge)
@@ -73,7 +126,7 @@ return function(Release)
                 local Character = Player.Character
                 local HRPart = Character and Character:FindFirstChild("HumanoidRootPart")
 
-                Siren:Disable(HRPart:FindFirstChildOfClass("JointInstance"))
+                Siren:Disable(HRPart:FindFirstChild("RootJoint"))
             end
         end
     })

@@ -51,7 +51,7 @@ local sirenLib = {
         local InstanceDisabled;
         local Locked;
 
-        task.delay(0.2, function()
+        task.delay(0.5, function()
             if InstanceDisabled then
                 InstanceDisabled:Disconnect();
             end
@@ -63,7 +63,7 @@ local sirenLib = {
             Locked = true
         end)
 
-        task.wait(0.2);
+        task.wait(0.5);
 
         if Locked then return Locked end
 
@@ -127,20 +127,16 @@ local sirenLib = {
             end
             if not sirenToggleScript.Enabled and Finished then
                 Finished = false
-                -- task.wait(0.1)
-                -- sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
                 for _ = 1, 4 do
-                    -- task.wait(PingValue / 10000)
                     if _ % 3 == 0 then
-                        task.wait(0.6)
+                        task.wait(0.5)
+                        RunService.RenderStepped:Wait()
                     end
                     if not instance or not instance.Enabled or stop then break end
                     if sirenToggleScript.Enabled then
                         sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
                     end
                     coroutine.wrap(function()
-                        -- task.wait(0.02)
-                        -- if not instance.Enabled then return end
                         toggleSiren:FireServer({
                             Part1 = {
                                 Part_Weld = true,
@@ -153,13 +149,12 @@ local sirenLib = {
                             }
                         })
 
-                        if _ % 2 == 0 then
+                        if _ == 4 then
                             Finished = true
                         end
 
                     end)()
                 end
-                -- Finished = true
             end
         end)
     end

@@ -56,7 +56,7 @@ end
 
 function GetPlayerFromPart(part)
     for _, Player in next, Players:GetPlayers() do
-        if Player.Character and part:IsDescendantOf(Player.Character) then
+        if Player.Character and part and part:IsDescendantOf(Player.Character) then
             return Player
         end
     end
