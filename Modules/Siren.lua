@@ -123,7 +123,7 @@ local sirenLib = {
             if not sirenToggleScript.Enabled and Finished then
                 Finished = false
                 for _ = 1, 4 do
-                    if _ % 3 == 0 then
+                    if _ == 3 then
                         task.wait(0.5)
                         RunService.RenderStepped:Wait()
                     end
