@@ -11,7 +11,6 @@ local Prison_ITEMS = workspace:WaitForChild("Prison_ITEMS")
 local sirenLib = {
     Locked = false,
     Disabled = {},
-
     GetSound = function()
         workspace.Remote.ItemHandler:InvokeServer(Prison_ITEMS.giver.M9.ITEMPICKUP)
         local m9 = LocalPlayer.Backpack:WaitForChild("M9") or LocalPlayer.Character:FindFirstChild("M9")
@@ -102,14 +101,24 @@ local sirenLib = {
     BreakJoints = function(self, Model)
         for _, Weld in next, Model:GetDescendants() do
             if Weld:IsA("JointInstance") then
-                self:Disable(Weld)
+                table.insert(self.Disabled, Weld)
             end
         end
+    end,
+    Play = function(self, sound)
+        if sound.IsPlaying then return end
+        toggleSiren:FireServer({
+            isOn = LocalPlayer.Status.isArrested,
+            Speaker = {
+                Part_Weld = true,
+                Sound = sound
+            }
+        })
     end,
     Disable = function(self, instance)
         local stop = false
 
-        task.delay(1, function()
+        task.delay(0.85, function()
             stop = true
         end)
 
@@ -122,16 +131,17 @@ local sirenLib = {
             end
             if not sirenToggleScript.Enabled and Finished then
                 Finished = false
-                for _ = 1, 4 do
-                    if _ == 3 then
-                        task.wait(0.5)
-                        RunService.RenderStepped:Wait()
-                    end
+                for i = 1, 4 do
+                    -- print(i)
                     if not instance or not instance.Enabled or stop then break end
                     if sirenToggleScript.Enabled then
                         sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
+                        task.wait(0.24)
                     end
+                    -- task.wait(0.2)
+
                     coroutine.wrap(function()
+
                         toggleSiren:FireServer({
                             Part1 = {
                                 Part_Weld = true,
@@ -144,7 +154,7 @@ local sirenLib = {
                             }
                         })
 
-                        if _ == 4 then
+                        if i == 4 then
                             Finished = true
                         end
                     end)()
@@ -157,7 +167,7 @@ local sirenLib = {
 sirenLib.DisableQueue = coroutine.create(function()
     while true do task.wait()
         for i, instance in next, sirenLib.Disabled do
-            if i % 5 == 0 then task.wait(0.2) end
+            if i % 10 == 0 then task.wait(0.2) end
             if instance then
                 task.spawn(sirenLib.Disable, sirenLib, instance)
             end
@@ -166,13 +176,15 @@ sirenLib.DisableQueue = coroutine.create(function()
     end
 end)
 
+
 if sirenLib:Lock(sirenToggleScript) and not ServerLocked then
     print("Server is locked, the script will execute.")
     coroutine.resume(sirenLib.DisableQueue)
     getgenv().ServerLocked = true
 elseif sirenToggleScript.Disabled then
-    print("Server is disabled, attempting to purge.")
+    if not ServerLocked then 
+       print("Server is disabled, attempting to purge.")
+    end
     -- Add crash here
 end
-
 return sirenLib
