@@ -1,5 +1,3 @@
-local PingValue = 0
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -9,9 +7,6 @@ local Remote = workspace:WaitForChild("Remote")
 local toggleSiren = Remote:WaitForChild("toggleSiren")
 local sirenToggleScript = toggleSiren:WaitForChild("sirenToggleScript")
 local Prison_ITEMS = workspace:WaitForChild("Prison_ITEMS")
-local PingStat = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]
-
-
 
 local sirenLib = {
     Locked = false,
@@ -152,7 +147,6 @@ local sirenLib = {
                         if _ == 4 then
                             Finished = true
                         end
-
                     end)()
                 end
             end
@@ -172,15 +166,13 @@ sirenLib.DisableQueue = coroutine.create(function()
     end
 end)
 
-RunService.Heartbeat:Connect(function()
-    PingValue = PingStat:GetValue()
-end)
-
-if sirenLib:Lock(sirenToggleScript) then
+if sirenLib:Lock(sirenToggleScript) and not ServerLocked then
     print("Server is locked, the script will execute.")
     coroutine.resume(sirenLib.DisableQueue)
+    getgenv().ServerLocked = true
 elseif sirenToggleScript.Disabled then
     print("Server is disabled, attempting to purge.")
+    -- Add crash here
 end
 
 return sirenLib
