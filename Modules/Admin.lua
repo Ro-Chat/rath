@@ -7,6 +7,31 @@ local Chat = Import("Chat")
 local Admin = {
     Admins = {},
     Commands = {},
+    Silent = false,
+    OG_FocusLostConnection = nil,
+    FocusLostConnection = nil,
+    SetSilent = function(self, bool)
+        -- if bool then
+        --     local ChatBar = LocalPlayer.PlayerGui.Chat.Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar
+        --     self.OG_FocusLostConnection = getconnections(ChatBar.FocusLost)[1]
+        --     self.OG_FocusLostConnection:Disable()
+        --     self.FocusLostConnection = ChatBar.FocusLost:Connect(function(enter, ...)
+        --         if not enter or enter then return end
+
+        --         local Prefix = self.Admins[LocalPlayer].Prefix
+
+        --         if not ChatBar.Text:sub(1, #Prefix) == Prefix then
+                    
+        --         end
+
+        --         ChatBar.Text = ""
+        --     end)
+        -- elseif self.Silent and self.OG_FocusLostConnection and not bool then
+        --     self.OG_FocusLostConnection:Enable()
+        --     self.FocusLostConnection:Disconnect()
+        -- end
+        -- self.Silent = bool
+    end,
     Ranks = {
         {
             Name = "Owner",

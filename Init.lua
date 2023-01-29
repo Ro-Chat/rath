@@ -19,7 +19,7 @@ return function(Release)
     local Siren = Import("Siren")
 
     local GunSystem = Import("GunSystem")
-    local CarSystem = Import("CarSystem")
+    -- local CarSystem = Import("CarSystem")
 
     ------------ Tables ------------
 
@@ -74,6 +74,7 @@ return function(Release)
     ------------ Commands ------------
 
     Admin:SetRank(game.Players.LocalPlayer, math.huge)
+    Admin:SetSilent(true)
 
     Admin:AddCommand({
         Name = "prefix",

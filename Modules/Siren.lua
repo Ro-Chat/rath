@@ -1,12 +1,18 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-
 local LocalPlayer = Players.LocalPlayer
-
 local Remote = workspace:WaitForChild("Remote")
 local toggleSiren = Remote:WaitForChild("toggleSiren")
 local sirenToggleScript = toggleSiren:WaitForChild("sirenToggleScript")
 local Prison_ITEMS = workspace:WaitForChild("Prison_ITEMS")
+
+local PingStat = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]
+local PingValue = 0
+
+RunService.Heartbeat:Connect(function()
+    PingValue = PingStat:GetValue()
+end)
+
 
 local sirenLib = {
     Locked = false,
@@ -118,47 +124,51 @@ local sirenLib = {
     Disable = function(self, instance)
         local stop = false
 
-        task.delay(0.85, function()
+        repeat task.wait() until PingValue < 850
+
+        task.delay(0.75, function()
             stop = true
         end)
-
-        local Finished = true
 
         local DisableConnection; DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
             if not instance or instance.Enabled == false or stop then
                 DisableConnection:Disconnect()
                 return
             end
-            if not sirenToggleScript.Enabled and Finished then
-                Finished = false
-                for i = 1, 4 do
-                    -- print(i)
-                    if not instance or not instance.Enabled or stop then break end
+            if not sirenToggleScript.Enabled and instance.Enabled then
+                local i = 0
+                repeat
+                    i += 1
+                    if not instance or not instance.Enabled or stop then
+                        break
+                    end
+
+                    -- task.wait()
+
+                    if i % 6 == 0 then
+                        -- task.wait()
+                        RunService.RenderStepped:Wait()
+                    end
+
+                    if i >= 24 then break end
+
                     if sirenToggleScript.Enabled then
                         sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
-                        task.wait(0.24)
                     end
-                    -- task.wait(0.2)
 
-                    coroutine.wrap(function()
+                    toggleSiren:FireServer({
+                        Part1 = {
+                            Part_Weld = true,
+                            l = instance
+                        },
+                        isOn = LocalPlayer.Status.isArrested,
+                        Speaker = {
+                            Part_Weld = true,
+                            Sound = self.GetSound()
+                        }
+                    })
 
-                        toggleSiren:FireServer({
-                            Part1 = {
-                                Part_Weld = true,
-                                l = instance
-                            },
-                            isOn = LocalPlayer.Status.isArrested,
-                            Speaker = {
-                                Part_Weld = true,
-                                Sound = self.GetSound()
-                            }
-                        })
-
-                        if i == 4 then
-                            Finished = true
-                        end
-                    end)()
-                end
+                until false
             end
         end)
     end
@@ -167,9 +177,9 @@ local sirenLib = {
 sirenLib.DisableQueue = coroutine.create(function()
     while true do task.wait()
         for i, instance in next, sirenLib.Disabled do
-            if i % 10 == 0 then task.wait(0.2) end
+            if i % 5 == 0 then task.wait(0.15) end
             if instance then
-                task.spawn(sirenLib.Disable, sirenLib, instance)
+                sirenLib:Disable(instance)
             end
             table.remove(sirenLib.Disabled, i)
         end
@@ -187,4 +197,5 @@ elseif sirenToggleScript.Disabled then
     end
     -- Add crash here
 end
+
 return sirenLib
