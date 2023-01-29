@@ -121,13 +121,28 @@ local sirenLib = {
             }
         })
     end,
+    Stop = function(self, sound)
+        if not sound.IsPlaying then return end
+        toggleSiren:FireServer({
+            isOn = LocalPlayer.Status.isArrested,
+            Speaker = {
+                Part_Weld = true,
+                Sound = sound
+            }
+        })
+    end,
     Disable = function(self, instance)
         local stop = false
 
         repeat task.wait() until PingValue < 850
 
-        task.delay(0.75, function()
+        task.delay(0.55, function()
             stop = true
+            if not instance or not instance.Parent then return end
+                task.wait(0.35)
+                if not instance.Enabled then return end
+                print("not disabled", instance:GetFullName())
+                self:Disable(instance)
         end)
 
         local DisableConnection; DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
@@ -139,22 +154,23 @@ local sirenLib = {
                 local i = 0
                 repeat
                     i += 1
+
+                    -- task.wait()
+
+                    -- if i % 20 == 0 then
+                    --     task.wait(0.5)
+                    --     -- local t = (PingValue / 10000) * 5
+                    --     -- task.wait(t)
+                    --     -- task.wait()
+                    --     -- print(t)
+                    --     -- RunService.Stepped:Wait()
+                    -- end
+
                     if not instance or not instance.Enabled or stop then
                         break
                     end
 
-                    -- task.wait()
-
-                    if i % 6 == 0 then
-                        -- task.wait()
-                        RunService.RenderStepped:Wait()
-                    end
-
-                    if i >= 24 then break end
-
-                    if sirenToggleScript.Enabled then
-                        sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
-                    end
+                    -- if i >= 100 then break end
 
                     toggleSiren:FireServer({
                         Part1 = {
@@ -168,6 +184,15 @@ local sirenLib = {
                         }
                     })
 
+                    
+
+                    if i % 15 == 0 then
+                        task.wait(0.105 + (PingValue / 10000))
+                        -- if sirenToggleScript.Enabled then
+                        --     sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
+                        -- end
+                        -- RunService.Stepped:Wait()
+                    end
                 until false
             end
         end)
@@ -177,7 +202,7 @@ local sirenLib = {
 sirenLib.DisableQueue = coroutine.create(function()
     while true do task.wait()
         for i, instance in next, sirenLib.Disabled do
-            if i % 5 == 0 then task.wait(0.15) end
+            if i % 5 == 0 then task.wait(0.1) end
             if instance then
                 sirenLib:Disable(instance)
             end
