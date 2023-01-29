@@ -132,69 +132,72 @@ local sirenLib = {
         })
     end,
     Disable = function(self, instance)
-        local stop = false
 
-        repeat task.wait() until PingValue < 850
+        task.spawn(function
 
-        task.delay(0.55, function()
-            stop = true
-            if not instance or not instance.Parent then return end
-                task.wait(0.35)
-                if not instance.Enabled then return end
-                print("not disabled", instance:GetFullName())
-                self:Disable(instance)
-        end)
+            local stop = false
 
-        local DisableConnection; DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
-            if not instance or instance.Enabled == false or stop then
-                DisableConnection:Disconnect()
-                return
-            end
-            if not sirenToggleScript.Enabled and instance.Enabled then
-                local i = 0
-                repeat
-                    i += 1
+            repeat task.wait() until PingValue < 850
+            task.delay(0.55, function()
+                stop = true
+                if not instance or not instance.Parent then return end
+                    task.wait(0.3)
+                    if not instance.Enabled then return end
+                    print("not disabled", instance:GetFullName())
+                    self:Disable(instance)
+            end)
 
-                    -- task.wait()
+            local DisableConnection; DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
+                if not instance or instance.Enabled == false or stop then
+                    DisableConnection:Disconnect()
+                    return
+                end
+                if not sirenToggleScript.Enabled and instance.Enabled then
+                    local i = 0
+                    repeat
+                        i += 1
 
-                    -- if i % 20 == 0 then
-                    --     task.wait(0.5)
-                    --     -- local t = (PingValue / 10000) * 5
-                    --     -- task.wait(t)
-                    --     -- task.wait()
-                    --     -- print(t)
-                    --     -- RunService.Stepped:Wait()
-                    -- end
+                        -- task.wait()
 
-                    if not instance or not instance.Enabled or stop then
-                        break
-                    end
-
-                    -- if i >= 100 then break end
-
-                    toggleSiren:FireServer({
-                        Part1 = {
-                            Part_Weld = true,
-                            l = instance
-                        },
-                        isOn = LocalPlayer.Status.isArrested,
-                        Speaker = {
-                            Part_Weld = true,
-                            Sound = self.GetSound()
-                        }
-                    })
-
-                    
-
-                    if i % 15 == 0 then
-                        task.wait(0.105 + (PingValue / 10000))
-                        -- if sirenToggleScript.Enabled then
-                        --     sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
+                        -- if i % 20 == 0 then
+                        --     task.wait(0.5)
+                        --     -- local t = (PingValue / 10000) * 5
+                        --     -- task.wait(t)
+                        --     -- task.wait()
+                        --     -- print(t)
+                        --     -- RunService.Stepped:Wait()
                         -- end
-                        -- RunService.Stepped:Wait()
-                    end
-                until false
-            end
+
+                        if not instance or not instance.Enabled or stop then
+                            break
+                        end
+
+                        -- if i >= 100 then break end
+
+                        toggleSiren:FireServer({
+                            Part1 = {
+                                Part_Weld = true,
+                                l = instance
+                            },
+                            isOn = LocalPlayer.Status.isArrested,
+                            Speaker = {
+                                Part_Weld = true,
+                                Sound = self.GetSound()
+                            }
+                        })
+
+                        
+
+                        if i % 5 == 0 then
+                            task.wait((PingValue / 10000))
+                            -- if sirenToggleScript.Enabled then
+                            --     sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
+                            -- end
+                            -- RunService.Stepped:Wait()
+                        end
+                    until false
+                end
+            end)
         end)
     end
 }
