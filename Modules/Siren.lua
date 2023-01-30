@@ -137,7 +137,7 @@ local sirenLib = {
 
             repeat task.wait() until PingValue < 850
 
-            task.delay(0.35, function()
+            task.delay(0.8, function()
                 stop = true
                 if not instance or not instance.Parent then return end
                     task.wait(0.4)
@@ -188,7 +188,7 @@ local sirenLib = {
                         
 
                         if i % 5 == 0 then
-                            task.wait(0.03 + (PingValue / 10000))
+                            task.wait(0.01 + (PingValue / 10000))
                             -- if sirenToggleScript.Enabled then
                             --     sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
                             -- end
