@@ -135,26 +135,34 @@ local sirenLib = {
         task.spawn(function()
             local stop = false
 
-            repeat task.wait() until PingValue < 850
+            -- repeat task.wait() until PingValue < 850
 
-            task.delay(0.8, function()
+            -- task.delay(0.45, function()
+            --     stop = true
+            -- end)
+
+            local EnabledConnection;
+            if not instance then return end
+
+            EnabledConnection = instance:GetPropertyChangedSignal("Enabled"):Connect(function()
+                if instance.Enabled then return end
                 stop = true
                 if not instance or not instance.Parent then return end
-                    task.wait(0.4)
-                    if not instance.Enabled then return end
-                    print("not disabled", instance:GetFullName())
-                    self:Disable(instance)
+                task.wait(0.5)
+                if not instance.Enabled then return end
+                print("not disabled", instance:GetFullName())
+                self:Disable(instance)
+                EnabledConnection:Disconnect()
             end)
 
+    
             local DisableConnection; DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
-                if not instance or instance.Enabled == false or stop then
+                if not instance or stop then
                     DisableConnection:Disconnect()
                     return
                 end
-                if sirenToggleScript.Enabled and instance.Enabled then
-                    local i = 0
-                    repeat
-                        i += 1
+                if not sirenToggleScript.Enabled and instance.Enabled then
+                    for i = 1, 25 do
 
                         -- task.wait()
 
@@ -167,34 +175,35 @@ local sirenLib = {
                         --     -- RunService.Stepped:Wait()
                         -- end
 
-                        if not instance or not instance.Enabled or stop then
+                        if not instance or stop then
                             break
                         end
 
-                        -- if i >= 100 then break end
-
-                        toggleSiren:FireServer({
-                            Part1 = {
-                                Part_Weld = true,
-                                l = instance
-                            },
-                            isOn = LocalPlayer.Status.isArrested,
-                            Speaker = {
-                                Part_Weld = true,
-                                Sound = self.GetSound()
-                            }
-                        })
+                        -- if i >= 50 then break end
+                        -- task.spawn(function()
+                            toggleSiren:FireServer({
+                                Part1 = {
+                                    Part_Weld = true,
+                                    l = instance
+                                },
+                                isOn = LocalPlayer.Status.isArrested,
+                                Speaker = {
+                                    Part_Weld = true,
+                                    Sound = self.GetSound()
+                                }
+                            })
+                        -- end)
 
                         
 
                         if i % 5 == 0 then
-                            task.wait(0.01 + (PingValue / 10000))
-                            -- if sirenToggleScript.Enabled then
+                            task.wait(0.005 + ((PingValue / 10000) * 7))
+                            -- if not sirenToggleScript.Enabled then
                             --     sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
                             -- end
-                            -- RunService.Stepped:Wait()
+                            -- RunService.RenderStepped:Wait()
                         end
-                    until false
+                    end
                 end
             end)
         end)

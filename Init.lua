@@ -29,8 +29,10 @@ return function(Release)
         LHip = {},
         RHip = {},
         RShoulder = {},
-        LShoulder = {}
+        LShoulder = {},
+        RJoint = {}
     }
+    
     ------------ Gun System ------------
     
     GunSystem:Add("Disable", function(Data)
