@@ -1,3 +1,6 @@
+
+--- For debugging put this script inside your executor instead of the loadstring.
+
 local Status, Release = pcall(function() return debug.getinfo(4) end)
 Release = Status and Release
 
