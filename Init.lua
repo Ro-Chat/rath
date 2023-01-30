@@ -26,9 +26,11 @@ return function(Release)
     local Loop = {
         Kill = {},
         Bean = {},
-
+        LHip = {},
+        RHip = {},
+        RShoulder = {},
+        LShoulder = {}
     }
-
     ------------ Gun System ------------
     
     GunSystem:Add("Disable", function(Data)
