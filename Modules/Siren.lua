@@ -135,75 +135,57 @@ local sirenLib = {
         task.spawn(function()
             local stop = false
 
-            -- repeat task.wait() until PingValue < 850
+            local DisableConnection
 
-            -- task.delay(0.45, function()
-            --     stop = true
-            -- end)
-
-            local EnabledConnection;
             if not instance then return end
 
-            EnabledConnection = instance:GetPropertyChangedSignal("Enabled"):Connect(function()
-                if instance.Enabled then return end
+            task.delay(0.65, function()
                 stop = true
                 if not instance or not instance.Parent then return end
+                DisableConnection:Disconnect()
                 task.wait(0.5)
-                if not instance.Enabled then return end
+                if not instance or not instance.Parent or not instance.Enabled then return end
                 print("not disabled", instance:GetFullName())
                 self:Disable(instance)
-                EnabledConnection:Disconnect()
             end)
-
     
-            local DisableConnection; DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
+            DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
                 if not instance or stop then
                     DisableConnection:Disconnect()
                     return
                 end
                 if not sirenToggleScript.Enabled and instance.Enabled then
-                    for i = 1, 25 do
+                    local i = 0
 
-                        -- task.wait()
+                    repeat
 
-                        -- if i % 20 == 0 then
-                        --     task.wait(0.5)
-                        --     -- local t = (PingValue / 10000) * 5
-                        --     -- task.wait(t)
-                        --     -- task.wait()
-                        --     -- print(t)
-                        --     -- RunService.Stepped:Wait()
-                        -- end
+                        i += 1
 
                         if not instance or stop then
                             break
                         end
 
-                        -- if i >= 50 then break end
-                        -- task.spawn(function()
-                            toggleSiren:FireServer({
-                                Part1 = {
-                                    Part_Weld = true,
-                                    l = instance
-                                },
-                                isOn = LocalPlayer.Status.isArrested,
-                                Speaker = {
-                                    Part_Weld = true,
-                                    Sound = self.GetSound()
-                                }
-                            })
-                        -- end)
+                        toggleSiren:FireServer({
+                            Part1 = {
+                                Part_Weld = true,
+                                l = instance
+                            },
+                            isOn = LocalPlayer.Status.isArrested,
+                            Speaker = {
+                                Part_Weld = true,
+                                Sound = self.GetSound()
+                            }
+                        })
 
-                        
 
-                        if i % 5 == 0 then
-                            task.wait(0.005 + ((PingValue / 10000) * 7))
-                            -- if not sirenToggleScript.Enabled then
-                            --     sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
-                            -- end
-                            -- RunService.RenderStepped:Wait()
+                        if sirenToggleScript.Enabled then
+                            sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
                         end
-                    end
+
+                        if i % 2 == 0 then
+                            RunService.Heartbeat:Wait()
+                        end
+                    until false
                 end
             end)
         end)
@@ -213,7 +195,7 @@ local sirenLib = {
 sirenLib.DisableQueue = coroutine.create(function()
     while true do task.wait()
         for i, instance in next, sirenLib.Disabled do
-            if i % 5 == 0 then task.wait(0.1) end
+            if i % 5 == 0 then task.wait(0.2) end
             if instance then
                 sirenLib:Disable(instance)
             end

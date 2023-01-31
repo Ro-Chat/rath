@@ -15,24 +15,25 @@ return function(Release)
     
     ------------ Modules ------------
 
+    local Loop = Import("Loop")
+
     local Admin = Import("Admin")
     local Siren = Import("Siren")
 
     local GunSystem = Import("GunSystem")
     -- local CarSystem = Import("CarSystem")
 
-    ------------ Tables ------------
+    ------------ Loops ------------
 
-    local Loop = {
-        Kill = {},
-        Bean = {},
-        LHip = {},
-        RHip = {},
-        RShoulder = {},
-        LShoulder = {},
-        RJoint = {}
-    }
-    
+    local LoopKill = Loop:Add("Kill")
+    local RJoint = Loop:Add("RJoint")
+    local Bean = Loop:Add("Bean")
+    local RLeg = Loop:Add("RLeg")
+    local LLeg = Loop:Add("LLeg")
+    local RArm = Loop:Add("RArm")
+    local LArm = Loop:Add("LArm")
+    local RHat = Loop:Add("Hat")
+
     ------------ Gun System ------------
     
     GunSystem:Add("Disable", function(Data)
@@ -78,7 +79,8 @@ return function(Release)
     ------------ Commands ------------
 
     Admin:SetRank(game.Players.LocalPlayer, math.huge)
-    Admin:SetSilent(true)
+    
+    -- Admin:SetSilent(true)
 
     Admin:AddCommand({
         Name = "prefix",
@@ -99,6 +101,29 @@ return function(Release)
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
                 Siren:Disable(Player.Character and Player.Character:FindFirstChild("Torso") and Player.Character.Torso:FindFirstChild("Neck"))
+            end
+        end
+    })
+
+    Admin:AddCommand({
+        Name = {"lk", "loopkill"},
+        Rank = 2,
+        Description = "Loop kills the player that is specified",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                local Character = Player.Character
+                local Torso = Character and Character:FindFirstChild("Torso")
+                local Neck = Torso and Torso:FindFirstChild("Neck")
+
+                Siren:Disable(Neck)
+
+                LoopKill:Append(Player, Player.CharacterAdded:Connect(function(Character)
+                    repeat task.wait() until Character:FindFirstChild("Torso") and Character.Torso:FindFirstChild("Neck")
+
+                    if not (Character:FindFirstChild("Torso") and Character.Torso:FindFirstChild("Neck")) then return end
+
+                    Siren:Disable(Player.Character.Torso.Neck)
+                end))
             end
         end
     })
@@ -176,6 +201,12 @@ return function(Release)
             end
         end
     })
+
+    -- Admin:AddCommand({
+    --     Name = {""},
+    --     Rank = 1,
+    --     Description = "Stop players from regenerating health."
+    -- })
 
     Admin:AddCommand({
         Name = {"nohat", "rhat"},
