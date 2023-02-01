@@ -135,6 +135,83 @@ return function(Release)
     })
 
     Admin:AddCommand({
+        Name = {"unos", "unoneshot"},
+        Rank = 2,
+        Description = "Disables oneshot for the player",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                GunSystem:RemovePlayer("Oneshot", Player)
+            end
+        end
+    })
+
+    Admin:AddCommand({
+        Name = {"stungun", "sg"},
+        Rank = 2,
+        Description = "Enables stungun for the player",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                GunSystem:AddPlayer("Disable", Player)
+            end
+        end
+    })
+
+    Admin:AddCommand({
+        Name = {"unsg", "unstungun"},
+        Rank = 2,
+        Description = "Disables stungun for the player",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                GunSystem:RemovePlayer("Disable", Player)
+            end
+        end
+    })
+
+    Admin:AddCommand({
+        Name = {"corruptcop", "cc"},
+        Rank = 2,
+        Description = "Enables corruptcop for the player",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                GunSystem:AddPlayer("Hostile", Player)
+            end
+        end
+    })
+
+    Admin:AddCommand({
+        Name = {"uncorruptcop", "uncc"},
+        Rank = 2,
+        Description = "Disables corruptcop for the player",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                GunSystem:RemovePlayer("Hostile", Player)
+            end
+        end
+    })
+
+    Admin:AddCommand({
+        Name = {"is", "innocentshot"},
+        Rank = 2,
+        Description = "Enables innocentshot for the player",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                GunSystem:AddPlayer("Innocent", Player)
+            end
+        end
+    })
+
+    Admin:AddCommand({
+        Name = {"unis", "uninnocentshot"},
+        Rank = 2,
+        Description = "Disables innocentshot for the player",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                GunSystem:RemovePlayer("Innocent", Player)
+            end
+        end
+    })
+
+    Admin:AddCommand({
         Name = {"lk", "loopkill"},
         Rank = 2,
         Description = "Loop kills the player that is specified",
