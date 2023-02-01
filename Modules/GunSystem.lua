@@ -18,7 +18,7 @@ local GunSystem = {
             end
         end
     end,
-    RemovePlayer = function(self, tye, plr)
+    RemovePlayer = function(self, type, plr)
         for i, v in next, self.Gun do
             if v.Type == type then
                 local idx = table.find(v.Players, plr)
@@ -62,9 +62,12 @@ function GetPlayerFromPart(part)
     end
 end
 
-GunSystem.Connection = ReplicateEvent.OnClientEvent:Connect(function(bulletData, isTaser)
+
+function BulletHandler(bulletData, isTaser)
     for _, bullet in next, bulletData do
         local Hit, Cframe, Distance, RayObject = bullet.Hit, bullet.Cframe, bullet.Distance, bullet.RayObject;
+
+        -- if Cframe == CFrame.new() then return end
 
         local CalculatedCFrame = Cframe * CFrame.new(0, 0, -Distance / 2);
         local WhoShot = GetClosestPlayerToPosition(CalculatedCFrame.p, 30);
@@ -76,13 +79,36 @@ GunSystem.Connection = ReplicateEvent.OnClientEvent:Connect(function(bulletData,
                     Shot = HitPlayer,
                     From = WhoShot,
                     Hit = Hit,
-                    CFrame = Cframe,
+                    Cframe = Cframe,
                     RayObject = RayObject,
                     Distance = Distance
                 })
             end
         end
     end
-end)
+end
+
+GunSystem.Connection = ReplicateEvent.OnClientEvent:Connect(BulletHandler)
+
+local namecall; namecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    local src = getfenv(3).script
+    local args = {...}
+
+    if method == "FireServer" and self.Name == "ShootEvent" then
+    --    if data.Cframe == CFrame.new() then return namecall(self, ...) end
+
+       task.spawn(function()
+            local Status, Error = pcall(BulletHandler, args[1])
+            if not Status then
+                warn(Error)
+            end
+        end)
+
+       return namecall(self, ...)
+    end
+
+    return namecall(self, ...)
+end))
 
 return GunSystem

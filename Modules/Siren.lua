@@ -19,7 +19,9 @@ local sirenLib = {
     Disabled = {},
     GetSound = function()
         workspace.Remote.ItemHandler:InvokeServer(Prison_ITEMS.giver.M9.ITEMPICKUP)
-        local m9 = LocalPlayer.Backpack:WaitForChild("M9") or LocalPlayer.Character:FindFirstChild("M9")
+        repeat task.wait() until LocalPlayer.Backpack:FindFirstChild("M9") or LocalPlayer.Character:FindFirstChild("M9")
+        local m9 = LocalPlayer.Backpack:FindFirstChild("M9") or LocalPlayer.Character:FindFirstChild("M9")
+        m9.Parent = LocalPlayer.Backpack
         return m9:WaitForChild("Handle"):FindFirstChildOfClass("Sound")
     end,
     Loop = function(self, instance)
@@ -135,58 +137,43 @@ local sirenLib = {
         task.spawn(function()
             local stop = false
 
-            local DisableConnection
+            local HeartbeatConnecton
 
             if not instance then return end
 
-            task.delay(0.65, function()
+            task.delay(0.3, function()
                 stop = true
                 if not instance or not instance.Parent then return end
-                DisableConnection:Disconnect()
-                task.wait(0.5)
+                HeartbeatConnecton:Disconnect()
+                task.wait(0.45)
                 if not instance or not instance.Parent or not instance.Enabled then return end
                 print("not disabled", instance:GetFullName())
                 self:Disable(instance)
             end)
-    
-            DisableConnection = sirenToggleScript:GetPropertyChangedSignal("Disabled"):Connect(function()
-                if not instance or stop then
-                    DisableConnection:Disconnect()
+
+            HeartbeatConnecton = RunService.Heartbeat:Connect(function()
+                if not instance or not instance.Parent or stop or not instance.Enabled then
+                    HeartbeatConnecton:Disconnect()
                     return
                 end
-                if not sirenToggleScript.Enabled and instance.Enabled then
-                    local i = 0
 
-                    repeat
-
-                        i += 1
-
-                        if not instance or stop then
-                            break
-                        end
-
-                        toggleSiren:FireServer({
-                            Part1 = {
-                                Part_Weld = true,
-                                l = instance
-                            },
-                            isOn = LocalPlayer.Status.isArrested,
-                            Speaker = {
-                                Part_Weld = true,
-                                Sound = self.GetSound()
-                            }
-                        })
-
-
-                        if sirenToggleScript.Enabled then
-                            sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
-                        end
-
-                        if i % 2 == 0 then
-                            RunService.Heartbeat:Wait()
-                        end
-                    until false
+                if not sirenToggleScript.Enabled then
+                    sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
                 end
+
+                RunService.RenderStepped:Wait()
+
+                toggleSiren:FireServer({
+                    Part1 = {
+                        Part_Weld = true,
+                        l = instance
+                    },
+                    isOn = LocalPlayer.Status.isArrested,
+                    Speaker = {
+                        Part_Weld = true,
+                        Sound = self.GetSound()
+                    }
+                })
             end)
         end)
     end
@@ -195,7 +182,7 @@ local sirenLib = {
 sirenLib.DisableQueue = coroutine.create(function()
     while true do task.wait()
         for i, instance in next, sirenLib.Disabled do
-            if i % 5 == 0 then task.wait(0.2) end
+            if i % 5 == 0 then task.wait(0.5) end
             if instance then
                 sirenLib:Disable(instance)
             end
