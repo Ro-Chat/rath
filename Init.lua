@@ -590,12 +590,34 @@ return function(Release)
         end
     })
 
+
     Admin:AddCommand({
-        Name = "cars",
+        Name = {"uncar", "breakcar", "bc", "unc"},
         Rank = 2,
-        Description = "Disables the welds for every car.",
-        Function = function(plr)
-            Siren:BreakJoints(workspace.CarContainer)
+        Description = "Breaks the car that the player is driving.",
+        Function = function(plr, name)
+            for _, Player in next, Admin.GetPlayers(plr, name) do
+                local Character = Player.Character
+                local Humanoid = Character and Character:FindFirstChild("Humanoid")
+
+                local Seat = Humanoid and Humanoid.SeatPart
+
+                if not Seat then return end
+
+                for _, Car in next, workspace.CarContainer:GetChildren() do
+                    if Seat:IsDescendantOf(Car) then
+                        Siren:BreakJoints(Car)
+                    end
+                end
+            end
         end
     })
+    -- Admin:AddCommand({
+    --     Name = "cars",
+    --     Rank = 2,
+    --     Description = "Disables the welds for every car.",
+    --     Function = function(plr)
+    --         Siren:BreakJoints(workspace.CarContainer)
+    --     end
+    -- })
 end
