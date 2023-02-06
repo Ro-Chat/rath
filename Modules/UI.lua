@@ -208,7 +208,7 @@ local function loadBar(toggled)
 end
 
 game:GetService("Players").LocalPlayer:GetMouse().KeyDown:Connect(function(Key)
-	if Key == CommandBar.HotKey then 
+	if Key == CommandBar.HotKey then
         loadBar(true)
     end
 end)

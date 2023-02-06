@@ -10,23 +10,25 @@ local GunSystem = {
             Type = type,
             Players = {}
         })
-    end,
-    AddPlayer = function(self, type, plr)
-        for i, v in next, self.Gun do
-            if v.Type == type then
-                table.insert(v.Players, plr)
-            end
-        end
-    end,
-    RemovePlayer = function(self, type, plr)
-        for i, v in next, self.Gun do
-            if v.Type == type then
-                local idx = table.find(v.Players, plr)
-                if idx then
-                    table.remove(v.Players, idx)
+        return {
+            Add = function(this, plr)
+                for _, v in next, self.Gun do
+                    if v.Type == type then
+                        table.insert(v.Players, plr)
+                    end
+                end
+            end,
+            Remove = function(this, plr)
+                for i, v in next, self.Gun do
+                    if v.Type == type then
+                        local idx = table.find(v.Players, plr)
+                        if idx then
+                            table.remove(v.Players, idx)
+                        end
+                    end
                 end
             end
-        end
+        }
     end,
     Gun = {},
 }

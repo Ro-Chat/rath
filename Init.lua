@@ -40,7 +40,7 @@ return function(Release)
 
     ------------ Gun System ------------
     
-    GunSystem:Add("Disable", function(Data)
+    local StunGun = GunSystem:Add("Disable", function(Data)
         local Shot = Data.Shot
         local Character = Shot and Shot.Character
 
@@ -50,7 +50,7 @@ return function(Release)
         Siren:Disable(RootJoint)
     end)
 
-    GunSystem:Add("Oneshot", function(Data)
+    local OneShot = GunSystem:Add("Oneshot", function(Data)
         local Shot = Data.Shot
         local Character = Shot and Shot.Character
 
@@ -62,7 +62,7 @@ return function(Release)
         Siren:Disable(Neck)
     end)
 
-    GunSystem:Add("Hostile", function(Data)
+    local HostileShot = GunSystem:Add("Hostile", function(Data)
         local Shot = Data.Shot
         local Status = Shot and Shot:FindFirstChild("Status")
 
@@ -71,7 +71,7 @@ return function(Release)
         Siren:Bool(Status.isHostile, true)
     end)
 
-    GunSystem:Add("Innocent", function(Data)
+    local InnocentGun = GunSystem:Add("Innocent", function(Data)
         local Shot = Data.Shot
         local Status = Shot and Shot.Status
 
@@ -82,18 +82,18 @@ return function(Release)
 
     ------------ Car System ------------
 
-    GunSystem:Add("CarDamage", CarSystem.CarDamageHandler)
+    local CarDamage = GunSystem:Add("CarDamage", CarSystem.CarDamageHandler)
 
     for _, Player in next, Players:GetPlayers() do
-        GunSystem:AddPlayer("CarDamage", Player)
+        CarDamage:Add(Player)
     end
 
     Players.PlayerAdded:Connect(function(Player)
-        GunSystem:AddPlayer("CarDamage", Player)
+        CarDamage:Add(Player)
     end)
 
     Players.PlayerRemoving:Connect(function(Player)
-        GunSystem:RemovePlayer("CarDamage", Player)
+        CarDamage:Remove(Player)
     end)
 
     ------------ Commands ------------
@@ -131,7 +131,7 @@ return function(Release)
         Description = "Enables oneshot for the player",
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
-                GunSystem:AddPlayer("Oneshot", Player)
+                OneShot:Add(Player)
             end
         end
     })
@@ -142,7 +142,7 @@ return function(Release)
         Description = "Disables oneshot for the player",
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
-                GunSystem:RemovePlayer("Oneshot", Player)
+                OneShot:Remove(Player)
             end
         end
     })
@@ -153,7 +153,7 @@ return function(Release)
         Description = "Enables stungun for the player",
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
-                GunSystem:AddPlayer("Disable", Player)
+                StunGun:Add(Player)
             end
         end
     })
@@ -164,7 +164,7 @@ return function(Release)
         Description = "Disables stungun for the player",
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
-                GunSystem:RemovePlayer("Disable", Player)
+                StunGun:Remove(Player)
             end
         end
     })
@@ -175,7 +175,7 @@ return function(Release)
         Description = "Enables corruptcop for the player",
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
-                GunSystem:AddPlayer("Hostile", Player)
+                HostileShot:Add(Player)
             end
         end
     })
@@ -186,7 +186,7 @@ return function(Release)
         Description = "Disables corruptcop for the player",
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
-                GunSystem:RemovePlayer("Hostile", Player)
+                HostileShot:Remove(Player)
             end
         end
     })
@@ -197,7 +197,7 @@ return function(Release)
         Description = "Enables innocentshot for the player",
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
-                GunSystem:AddPlayer("Innocent", Player)
+                InnocentGun:Add(Playe)
             end
         end
     })
@@ -208,7 +208,7 @@ return function(Release)
         Description = "Disables innocentshot for the player",
         Function = function(plr, name)
             for _, Player in next, Admin.GetPlayers(plr, name) do
-                GunSystem:RemovePlayer("Innocent", Player)
+                InnocentGun:Remove(Player)
             end
         end
     })
@@ -622,6 +622,4 @@ return function(Release)
     --         Siren:BreakJoints(workspace.CarContainer)
     --     end
     -- })
-    
-    return Context
 end
