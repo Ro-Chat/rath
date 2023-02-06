@@ -16,11 +16,13 @@ return function(Release)
         Script = Script or game:HttpGet(("https://raw.githubusercontent.com/Ro-Chat/rath/main/Modules/%s.lua"):format(module))
         return loadstring(Script)()
     end
-    
+
     ------------ Modules ------------
 
+    getgenv().Admin   = Import("Admin")
+
+    local UI         = Import("UI")
     local Loop       = Import("Loop")
-    local Admin      = Import("Admin")
     local Siren      = Import("Siren")
     local GunSystem  = Import("GunSystem")
     local CarSystem  = Import("CarSystem")
@@ -620,4 +622,6 @@ return function(Release)
     --         Siren:BreakJoints(workspace.CarContainer)
     --     end
     -- })
+    
+    return Context
 end

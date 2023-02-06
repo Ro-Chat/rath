@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local Remote = workspace:WaitForChild("Remote")
 local toggleSiren = Remote:WaitForChild("toggleSiren")
@@ -57,17 +58,21 @@ local sirenLib = {
             if InstanceDisabled then
                 InstanceDisabled:Disconnect();
             end
+            if not Locked and instance and instance.Enabled then
+                Locked = false
+            end
         end)
 
         InstanceDisabled = instance:GetPropertyChangedSignal("Enabled"):Connect(function()
-            if instance.Enabled then return end
+            -- if instance.Enabled then return end
             InstanceDisabled:Disconnect();
             Locked = true
         end)
 
-        task.wait(0.5);
+        task.wait(0.7);
 
-        if Locked then return Locked end
+        if Locked or Locked == nil then return Locked end
+        if ServerLocked then return true end
 
         self:Loop(instance)
 
@@ -151,7 +156,11 @@ local sirenLib = {
                 self:Disable(instance)
             end)
 
+            local Counter = 0
+
             HeartbeatConnecton = RunService.Heartbeat:Connect(function()
+                Counter = Counter + 1
+
                 if not instance or not instance.Parent or stop or not instance.Enabled then
                     HeartbeatConnecton:Disconnect()
                     return
@@ -161,7 +170,10 @@ local sirenLib = {
                     sirenToggleScript:GetPropertyChangedSignal("Enabled"):Wait()
                 end
 
-                RunService.RenderStepped:Wait()
+                -- if Counter % 2 == 0 then
+                    task.wait(PingValue / 10000)
+                    -- RunService.RenderStepped:Wait()
+                -- end
 
                 toggleSiren:FireServer({
                     Part1 = {
@@ -191,15 +203,61 @@ sirenLib.DisableQueue = coroutine.create(function()
     end
 end)
 
+local Locked = sirenLib:Lock(sirenToggleScript)
 
-if sirenLib:Lock(sirenToggleScript) and not ServerLocked then
+if Locked and not ServerLocked then
     print("Server is locked, the script will execute.")
     coroutine.resume(sirenLib.DisableQueue)
     getgenv().ServerLocked = true
-elseif sirenToggleScript.Disabled then
-    if not ServerLocked then 
+elseif not Locked and sirenToggleScript.Enabled == false and not ServerLocked then
+    getgenv().ServerLocked = true
        print("Server is disabled, attempting to purge.")
-    end
+        Remote.ItemHandler:InvokeServer(Prison_ITEMS.giver["Remington 870"].ITEMPICKUP)
+
+        local gun = LocalPlayer.Backpack:FindFirstChild("Remington 870") or Player.Character:FindFirstChild("Remington 870")
+        local shootevent = ReplicatedStorage.ShootEvent;
+        local weldevent = ReplicatedStorage.weldEvent
+        local bullets = {};
+
+        task.spawn(function()
+            for _ = 1, 25 do
+                table.insert(bullets, {
+                    Cframe = CFrame.new(),
+                    RayObject = Ray.new(Vector3.new(), Vector3.new()),
+                    Distance = 0,
+                    Hit = LocalPlayer.Character.Head
+                })
+            end
+        end)
+
+        task.wait(0.1)
+
+        -- if not customCheck or teamCheck then Remote.TeamEvent:FireServer("Bright yellow"); end
+        -- task.spawn(function ()
+        --     while true do task.wait()
+        --         for i, instance in next, Players:GetDescendants() do
+        --             if instance:IsA("Tool") then
+        --                 task.spawn(function()
+        --                     for i = 1, 3 do
+        --                         weldevent:FireServer(instance)
+        --                     end
+        --                 end)
+        --             end
+        --         end
+        --     end
+        -- end)
+        while true do task.wait()
+            task.spawn(function()
+                -- for i = 1, 2 do
+                    ReplicatedStorage.ReloadEvent:FireServer(gun);
+                -- end
+            end)
+            shootevent:FireServer(bullets, gun)
+            -- gun.Parent = LocalPlayer.Backpack
+            -- weldevent:FireServer(gun)
+            -- gun.Parent = LocalPlayer.Character 
+        end
+    -- Add crash here
     -- Add crash here
 end
 

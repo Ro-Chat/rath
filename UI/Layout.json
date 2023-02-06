@@ -1,0 +1,33 @@
+{
+    "CommandBar": {
+        "HotKey": ",",
+        "Colors": {
+            "Background": {
+                "Idle": [61, 61, 61],
+                "Hover": [61, 61, 61]
+            },
+            "ButtonSection": {
+                "Idle": [43, 43, 43],
+                "Hover": [43, 43, 43]
+            },
+            "Accent": {
+                "Idle": [240, 140, 26],
+                "Hover": [240, 140, 26]
+            }
+        },
+        "Home": {
+            "Image": false,
+            "Colors": {
+                "Idle": [77, 77, 77],
+                "Hover": [77, 77, 77]
+            }
+        },
+        "Code": {
+            "Image": false,
+            "Colors": {
+                "Idle": [77, 77, 77],
+                "Hover": [77, 77, 77]
+            }
+        }
+    }
+}

@@ -1,7 +1,5 @@
 local Siren = Import("Siren")
 
-local Players = game:GetService("Players")
-
 local Prison_ITEMS = workspace.Prison_ITEMS
 local CarContainer = workspace.CarContainer
 

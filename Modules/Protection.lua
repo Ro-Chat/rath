@@ -18,3 +18,4 @@ local Protection = {
         Whitelist = {}
     }
 }
+
