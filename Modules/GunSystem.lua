@@ -15,6 +15,7 @@ local GunSystem = {
                 for _, v in next, self.Gun do
                     if v.Type == type then
                         table.insert(v.Players, plr)
+                        break
                     end
                 end
             end,
@@ -24,6 +25,7 @@ local GunSystem = {
                         local idx = table.find(v.Players, plr)
                         if idx then
                             table.remove(v.Players, idx)
+                            break
                         end
                     end
                 end
@@ -73,6 +75,7 @@ function BulletHandler(bulletData, isTaser)
 
         local CalculatedCFrame = Cframe * CFrame.new(0, 0, -Distance / 2);
         local WhoShot = GetClosestPlayerToPosition(CalculatedCFrame.p, 30);
+        local Gun = WhoShot and WhoShot.Character and WhoShot.Character:FindFirstChildOfClass("Tool")
         local HitPlayer = GetPlayerFromPart(Hit);
 
         for _, GunData in next, GunSystem.Gun do
@@ -83,7 +86,8 @@ function BulletHandler(bulletData, isTaser)
                     Hit = Hit,
                     Cframe = Cframe,
                     RayObject = RayObject,
-                    Distance = Distance
+                    Distance = Distance,
+                    Gun = Gun
                 })
             end
         end

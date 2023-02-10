@@ -7,13 +7,13 @@ local CarSystem = {
     CarInfo = {
         Sedan = {
             Health = 1000,
-            Window = 100,
+            Window = 25,
             Tires = 60
         },
         Squad = {
             Health = 1500,
-            Window = 150,
-            Tires = 100
+            Window = 100,
+            Tires = 75
         }
     },
     Cars = {},
@@ -23,42 +23,45 @@ local CarSystem = {
     end,
     Destroy = function(self, Car)
         self.Cars[Car] = nil
-        Siren:BreakJoints(Car)
     end,
     CarDamageHandler = function(Data)
+        -- print(game:GetService("HttpService"):JSONEncode(Data))
         local Hit = Data.Hit
         local Gun = Data.Gun
+        -- print(Hit, Gun)
         local GunStates = Gun and Gun:FindFirstChild("GunStates") and require(Gun.GunStates)
     
         if not Hit or not Gun then return end
         
         local Car, CarData = GetCarFromPart(Hit)
+
+        if not CarData then return end
         CarData:Update(Hit, GunStates.Damage)
     end
 }
 
-CarContainer.ChildAdded:Connect(function(Car)
-    print(Car.Name, "Spawned")
+for _, Car in next, CarContainer:GetChildren() do
     CarSystem.Cars[Car] = {
         Car = Car,
         Name = Car.Name,
-        Window = CarSystem.CarInfo[Car.Name].Window,
-        Tire = CarSystem.CarInfo[Car.Name].Tire,
+        -- Window = CarSystem.CarInfo[Car.Name].Window,
+        -- Tire = CarSystem.CarInfo[Car.Name].Tires,
         Health = {
             Base = CarSystem.CarInfo[Car.Name].Health,
             Windshield = CarSystem.CarInfo[Car.Name].Window,
             RearWindow = CarSystem.CarInfo[Car.Name].Window,
             LeftWindow = CarSystem.CarInfo[Car.Name].Window,
-            Rightshield = CarSystem.CarInfo[Car.Name].Window,
-            LFTire = CarSystem.CarInfo[Car.Name].Tire,
-            RFTire = CarSystem.CarInfo[Car.Name].Tire,
-            LBTire = CarSystem.CarInfo[Car.Name].Tire,
-            RBTire = CarSystem.CarInfo[Car.Name].Tire,
+            RightWindow = CarSystem.CarInfo[Car.Name].Window,
+            LFTire = CarSystem.CarInfo[Car.Name].Tires,
+            RFTire = CarSystem.CarInfo[Car.Name].Tires,
+            LBTire = CarSystem.CarInfo[Car.Name].Tires,
+            RBTire = CarSystem.CarInfo[Car.Name].Tires,
         },
         DisableWelds = function(self, Part)
             for _, Weld in next, self.Car:GetDescendants() do
                 pcall(function()
                     if Weld:IsA("JointInstance") and (Weld.Part0 == Part or Weld.Part1 == Part) then
+                        -- print(Weld)
                         Siren:Disable(Weld)
                     end
                 end)
@@ -66,120 +69,217 @@ CarContainer.ChildAdded:Connect(function(Car)
         end,
         IdentifyPart = function(self, Part)
             local Main = self.Car.Body.Main
-            local Offset = Main.Position - Part.Position
+            -- local Offset = Part.Position - Main.Position
 
-            Offset = Vector3.new(math.floor(Offset.X), math.floor(Offset.Y), math.floor(Offset.Z))
-
-            if self.Name == "Squad" then
-                if Offset == Vector3.new(-7, -3, 5) or Offset == Vector3.new(-6, -4, 4) then
-                    -- Windshield
-                    return "Windshield"
+            local Angle = math.deg(math.acos(Main.CFrame.LookVector.unit:Dot((Part.Position-Main.Position).unit)))
+            local Offset = (Angle - 90)
+            Offset = math.ceil(Offset > 0 and Offset < 1 and Offset * 1000 or Offset)
+            -- Offset = Vector3.new(math.floor(Offset.X), math.floor(Offset.Y), math.floor(Offset.Z))
+            print(Offset)
+            if Offset == -20 then
+                return "LFTire"
+            end
+            if Offset == -78 then
+                return "LBTire"
+            end
+            if Offset == 21 then
+                return "RFTire"
+            end
+            if Offset == 79 then
+                return "RBTire"
+            end
+            if Part.Transparency > 0 then
+                if Offset == 33 or Offset == 44 then
+                    return "Windshield", {33, 44}
                 end
-
-                if Offset == Vector3.new(0, -3, -1) then
-                    -- Rear window
-                    return "RearWindow"
-                end
-
-                if Offset == Vector3.new(-2, -2, 6) then
-                    -- Left window
+                if Offset == -36 then
                     return "LeftWindow"
                 end
-
-                if Offset == Vector3.new(-7, -2, 0) then
-                    -- Right window
+                if Offset == 37 then
                     return "RightWindow"
                 end
-
-                if Offset == Vector3.new(-7, 0, 12) then
-                    -- Front left tire
-                    return "LFTire"
+                if Offset == 124 or Offset == 123 then
+                    return "RearWindow", {124, 123}
                 end
-
-                if Offset == Vector3.new(-13, 0, 4) then
-                    -- Front right tire
-                    return "RFTire"
-                end
-
-                if Offset == Vector3.new(-4, 1, -4) then
-                    -- Back right tire
-                    return "RBTire"
-                end
-
-                if Offset == Vector3.new(3, 1, 3) then
-                    -- Back left tire
-                    return "BLTire"
-                end
-
-                return "Base"
             end
 
-            if self.Name == "Sedan" then
-                if Offset == Vector3.new(0, -3, -9) or Offset == Vector3.new(0, -4, -8) then
-                    -- Windshield
-                    return "Windshield"
+            return "Base"
+            -- print(Part.Transparency, Angle, Offset)
+            
+        end,
+        GetPartFromAngle = function(self, Angle)
+            local Main = self.Car.Body.Main
+            for _, Part in next, self.Car:GetDescendants() do
+                if Part:IsA("BasePart") then
+                    local Offset = (math.deg(math.acos(Main.CFrame.LookVector.unit:Dot((Part.Position-Main.Position).unit))) - 90)
+                    Offset = math.ceil(Offset > 0 and Offset < 1 and Offset * 1000 or Offset)
+                    if Part.Transparency > 0 then
+                        if Offset == Angle then return Part end
+                    end
                 end
-
-                if Offset == Vector3.new(0, -4, -8) then
-                    -- Rear window
-                    return "RearWindow"
-                end
-
-                if Offset == Vector3.new(3, -2, -5) then
-                    -- Right window
-                    return "RightWindow"
-                end
-
-                if Offset == Vector3.new(-4, -2, -5) then
-                    -- Left window
-                    return "LeftWindow"
-                end
-
-                if Offset == Vector3.new(4, 1 -13) then
-                    -- Front left tire
-                    return "LFTire"
-                end
-
-                if Offset == Vector3.new(-5, 0, -13) then
-                    -- Front right tire
-                    return "LRTire"
-                end
-
-                if Offset == Vector3.new(-5, 0, -1) then
-                    -- Back left tire
-                    return "LBTire"
-                end
-
-                if Offset == Vector3.new(4, 0, -1) then
-                    -- Back right tire
-                    return "RBTire"
-                end
-
-                return "Base"
             end
         end,
         Update = function(self, Hit, Damage)
-            local Identifier = self:IdentifyPart(Hit)
+            local Identifier, Angles = self:IdentifyPart(Hit)
             local Health = self.Health[Identifier]
 
             Health = Health - Damage
 
-            print("Car hit at", Identifier, "for", Damage, "damage.")
+            print("Car hit at", Identifier, "for", Damage, "damage leaving ", Health, "amount of health")
 
             self.Health[Identifier] = Health
 
             if Health <= 0 then
+                self.Health[Identifier] = math.huge
                 if Identifier ~= "Base" then
-                    self:DisableWelds(Hit)
+                    if Identifier == "Windshield" or Identifier == "RearWindow" then
+                        for _, Angle in next, Angles do
+                            local Part = self:GetPartFromAngle(Angle)
+                            -- if Part.Transparency > 0 then
+                                self:DisableWelds(Part)
+                            -- end
+                            -- print(Part)
+                        end
+                    else
+                        self:DisableWelds(Hit)
+                    end
+                    -- end
                     return
                 end
                 self:Destroy()
             end
         end,
         Destroy = function(self)
+            for _, Seat in next, self.Car.Body:GetChildren() do
+                if Seat:IsA("Seat") then
+                    self:DisableWelds(self.Car.Body.Seat)
+                end
+            end
             CarSystem:Destroy(self.Car)
         end
     }
+end
+
+CarContainer.ChildAdded:Connect(function(Car)
+    print(Car.Name, "Spawned")
+    CarSystem.Cars[Car] = {
+        Car = Car,
+        Name = Car.Name,
+        -- Window = CarSystem.CarInfo[Car.Name].Window,
+        -- Tire = CarSystem.CarInfo[Car.Name].Tires,
+        Health = {
+            Base = CarSystem.CarInfo[Car.Name].Health,
+            Windshield = CarSystem.CarInfo[Car.Name].Window,
+            RearWindow = CarSystem.CarInfo[Car.Name].Window,
+            LeftWindow = CarSystem.CarInfo[Car.Name].Window,
+            RightWindow = CarSystem.CarInfo[Car.Name].Window,
+            LFTire = CarSystem.CarInfo[Car.Name].Tires,
+            RFTire = CarSystem.CarInfo[Car.Name].Tires,
+            LBTire = CarSystem.CarInfo[Car.Name].Tires,
+            RBTire = CarSystem.CarInfo[Car.Name].Tires,
+        },
+        DisableWelds = function(self, Part)
+            for _, Weld in next, self.Car:GetDescendants() do
+                pcall(function()
+                    if Weld:IsA("JointInstance") and (Weld.Part0 == Part or Weld.Part1 == Part) then
+                        -- print(Weld)
+                        Siren:Disable(Weld)
+                    end
+                end)
+            end
+        end,
+        IdentifyPart = function(self, Part)
+            local Main = self.Car.Body.Main
+            -- local Offset = Part.Position - Main.Position
+
+            local Angle = math.deg(math.acos(Main.CFrame.LookVector.unit:Dot((Part.Position-Main.Position).unit)))
+            local Offset = (Angle - 90)
+            Offset = math.ceil(Offset > 0 and Offset < 1 and Offset * 1000 or Offset)
+            -- Offset = Vector3.new(math.floor(Offset.X), math.floor(Offset.Y), math.floor(Offset.Z))
+            print(Offset)
+            if Offset == -20 then
+                return "LFTire"
+            end
+            if Offset == -78 then
+                return "LBTire"
+            end
+            if Offset == 21 then
+                return "RFTire"
+            end
+            if Offset == 79 then
+                return "RBTire"
+            end
+            if Part.Transparency > 0 then
+                if Offset == 33 or Offset == 44 then
+                    return "Windshield", {33, 44}
+                end
+                if Offset == -36 then
+                    return "LeftWindow"
+                end
+                if Offset == 37 then
+                    return "RightWindow"
+                end
+                if Offset == 124 or Offset == 123 then
+                    return "RearWindow", {124, 123}
+                end
+            end
+
+            return "Base"
+            -- print(Part.Transparency, Angle, Offset)
+            
+        end,
+        GetPartFromAngle = function(self, Angle)
+            local Main = self.Car.Body.Main
+            for _, Part in next, self.Car:GetDescendants() do
+                if Part:IsA("BasePart") then
+                    local Offset = (math.deg(math.acos(Main.CFrame.LookVector.unit:Dot((Part.Position-Main.Position).unit))) - 90)
+                    Offset = math.ceil(Offset > 0 and Offset < 1 and Offset * 1000 or Offset)
+                    if Part.Transparency > 0 then
+                        if Offset == Angle then return Part end
+                    end
+                end
+            end
+        end,
+        Update = function(self, Hit, Damage)
+            local Identifier, Angles = self:IdentifyPart(Hit)
+            local Health = self.Health[Identifier]
+
+            Health = Health - Damage
+
+            print("Car hit at", Identifier, "for", Damage, "damage leaving ", Health, "amount of health")
+
+            self.Health[Identifier] = Health
+
+            if Health <= 0 then
+                self.Health[Identifier] = math.huge
+                if Identifier ~= "Base" then
+                    if Identifier == "Windshield" or Identifier == "RearWindow" then
+                        for _, Angle in next, Angles do
+                            local Part = self:GetPartFromAngle(Angle)
+                            -- if Part.Transparency > 0 then
+                                self:DisableWelds(Part)
+                            -- end
+                            -- print(Part)
+                        end
+                    else
+                        self:DisableWelds(Hit)
+                    end
+                    -- end
+                    return
+                end
+                self:Destroy()
+            end
+        end,
+        Destroy = function(self)
+            for _, Seat in next, self.Car.Body:GetChildren() do
+                if Seat:IsA("Seat") then
+                    self:DisableWelds(self.Car.Body.Seat)
+                end
+            end
+            CarSystem:Destroy(self.Car)
+        end
+    }
+-- end)
 end)
 
 -- Tire "pops" when they're shot

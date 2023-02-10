@@ -2,12 +2,22 @@ local HttpService = game:GetService("HttpService")
 
 local Theme = {}
 
-if not isfile("Rath/UI/Layout.json") or not isfolder("Rath/UI") or not isfolder("Rath") then
-    if not isfolder("Rath") then makefolder("Rath") end
-    if not isfolder("Rath/UI") then makefolder("Rath/UI") end
-    if not isfolder("Rath/UI/Assets") then makefolder("Rath/UI/Assets") end
-    if not isfile("Rath/UI/Layout.json") then
+if not isfile("rath/UI/Layout.json") or not isfolder("rath/UI") or not isfolder("rath") then
+    if not isfolder("rath") then makefolder("rath") end
+    if not isfolder("rath/UI") then makefolder("rath/UI") end
+    if not isfolder("rath/UI/Assets") then makefolder("rath/UI/Assets") end
+    if not isfile("rath/UI/Layout.json") then
         Theme = {
+            Axiom = {
+                Images = {
+                    TabIcons = {
+                        Server = false,
+                        Client = false,
+                        Visuals = false,
+                        Default = false
+                    }
+                }
+            },
             CommandBar = {
                 HotKey = ",",
                 Colors = {
@@ -40,12 +50,12 @@ if not isfile("Rath/UI/Layout.json") or not isfolder("Rath/UI") or not isfolder(
                 }
             }
         }
-        writefile("Rath/UI/Layout.json", HttpService:JSONEncode(Theme))
+        writefile("rath/UI/Layout.json", HttpService:JSONEncode(Theme))
     else
-        Theme = HttpService:JSONDecode(readfile("Rath/UI/Layout.json"))
+        Theme = HttpService:JSONDecode(readfile("rath/UI/Layout.json"))
     end
 else
-    Theme = HttpService:JSONDecode(readfile("Rath/UI/Layout.json"))
+    Theme = HttpService:JSONDecode(readfile("rath/UI/Layout.json"))
 end
 
 return Theme

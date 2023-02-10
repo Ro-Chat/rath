@@ -10,6 +10,22 @@ local Theme = Import("Theme")
 
 ---------------- Command Bar ----------------
 
+local CommandBar = Theme.CommandBar
+
+local Home = CommandBar.Home
+local Code = CommandBar.Code
+
+local HomeColors = Home.Colors
+local CodeColors = Code.Colors
+local CommandBarColors = CommandBar.Colors
+
+local MainIdleColor = CommandBarColors.Background.Idle
+local AccentIdleColor = CommandBarColors.Accent.Idle
+local ButtonHolderIdleColor = CommandBarColors.ButtonSection.Idle
+
+local HomeIdleColor = HomeColors.Idle
+local CodeIdleColor = CodeColors.Idle
+
 local Axiom = Instance.new("ScreenGui")
 local Main = Instance.new("Frame")
 local SideLine = Instance.new("Frame")
@@ -26,22 +42,6 @@ local UIPadding = Instance.new("UIPadding")
 Axiom.Name = "Axiom"
 Axiom.Parent = game.CoreGui
 Axiom.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-local CommandBar = Theme.CommandBar
-
-local Home = CommandBar.Home
-local Code = CommandBar.Code
-
-local HomeColors = Home.Colors
-local CodeColors = Code.Colors
-local CommandBarColors = CommandBar.Colors
-
-local MainIdleColor = CommandBarColors.Background.Idle
-local AccentIdleColor = CommandBarColors.Accent.Idle
-local ButtonHolderIdleColor = CommandBarColors.ButtonSection.Idle
-
-local HomeIdleColor = HomeColors.Idle
-local CodeIdleColor = CodeColors.Idle
 
 Main.Name = "Main"
 Main.Parent = Axiom
@@ -220,19 +220,13 @@ InputedCommands.FocusLost:Connect(function(input)
         local Message = InputedCommands.Text
 
         if Message ~= "" then
-
+          pcall(function ()
             local PlayerData = Admin.Admins[LocalPlayer]
 
             local Command = Message:lower():match("^(%w+)%s?")
             Command = Admin.Commands[Command]
 
             local Args = Message:split(" ")
-
-            -- if PlayerData.Prefix:match("%s") then
-            --     for _ = 1, #PlayerData.Prefix:split(" ") do
-            --         table.remove(Args, 1)
-            --     end
-            -- end
 
             table.remove(Args, 1)
             table.insert(Args, 1, LocalPlayer)
@@ -253,6 +247,7 @@ InputedCommands.FocusLost:Connect(function(input)
             end
 
             Command.Callback(table.unpack(Args))
+          end)
         end
         loadBar(false)
     end

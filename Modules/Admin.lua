@@ -158,10 +158,10 @@ local Admin = {
             
             Chat:Connect(Player, function(Data)
                 local Message = Data.Message
-
+                
                 local PlayerData = self.Admins[Player]
 
-                local Command = Message:match("^" .. PlayerData.Prefix .. "(%w+)%s?")
+                local Command = Message:lower():match("^" .. PlayerData.Prefix .. "(%w+)%s?")
                 Command = self.Commands[Command]
 
                 local Args = Message:split(" ")
@@ -175,7 +175,7 @@ local Admin = {
                 table.remove(Args, 1)
                 table.insert(Args, 1, Player)
 
-                if Command and (Command.Rank > PlayerData.Rank or not table.find(Command.Whitelisted, Player)) then return end
+                if not Command or Command and not table.find(Command.Whitelisted, Player) and Command.Rank > PlayerData.Rank then return end
 
                 local ArgCount = debug.getinfo(Command.Callback).numparams
 
@@ -189,7 +189,7 @@ local Admin = {
                     table.remove(Args, ArgCount)
                     table.insert(Args, ArgCount, Arg)
                 end
-                
+
                 Command.Callback(table.unpack(Args))
             end)
     end

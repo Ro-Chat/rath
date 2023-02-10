@@ -1,21 +1,15 @@
 local Siren = Import("Siren")
 
 local Protection = {
-    Disable = {
-        Enabled = true,
-        Whitelist = {}
+    Protections = {
+        Bring = false,
+        Crash = false,
+        Kill = false,
     },
-    Arrest = {
-        Enabled = true,
-        Whitelist = {}
-    },
-    Kill = {
-        Enabled = true,
-        Whitelist = {}
-    },
-    Bring = {
-        Enabled = true,
-        Whitelist = {}
-    }
+    Whitelist = {},
+    GunBan = function()
+        
+    end
 }
+
 
