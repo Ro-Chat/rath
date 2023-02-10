@@ -63,7 +63,7 @@ local sirenLib = {
             Locked = true
         end)
 
-        task.wait(1);
+        task.wait(1.5);
 
         if Locked or Locked == nil then return Locked end
         if ServerLocked then return true end
