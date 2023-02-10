@@ -1,3 +1,5 @@
+-- duck likes men
+
 ------------ Services ------------
 
 local Players           = game:GetService("Players")
