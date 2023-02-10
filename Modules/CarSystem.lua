@@ -1,6 +1,5 @@
 local Siren = Import("Siren")
 
-local Prison_ITEMS = workspace.Prison_ITEMS
 local CarContainer = workspace.CarContainer
 
 local CarSystem = {
@@ -17,10 +16,6 @@ local CarSystem = {
         }
     },
     Cars = {},
-    New = function(self, car, pos)
-        -- spawn a new car and teleport it to position
-
-    end,
     Destroy = function(self, Car)
         self.Cars[Car] = nil
     end,

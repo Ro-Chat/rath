@@ -71,8 +71,6 @@ function BulletHandler(bulletData, isTaser)
     for _, bullet in next, bulletData do
         local Hit, Cframe, Distance, RayObject = bullet.Hit, bullet.Cframe, bullet.Distance, bullet.RayObject;
 
-        -- if Cframe == CFrame.new() then return end
-
         local CalculatedCFrame = Cframe * CFrame.new(0, 0, -Distance / 2);
         local WhoShot = GetClosestPlayerToPosition(CalculatedCFrame.p, 30);
         local Gun = WhoShot and WhoShot.Character and WhoShot.Character:FindFirstChildOfClass("Tool")
@@ -98,12 +96,9 @@ GunSystem.Connection = ReplicateEvent.OnClientEvent:Connect(BulletHandler)
 
 local namecall; namecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     local method = getnamecallmethod()
-    local src = getfenv(3).script
     local args = {...}
 
     if method == "FireServer" and self.Name == "ShootEvent" then
-    --    if data.Cframe == CFrame.new() then return namecall(self, ...) end
-
        task.spawn(function()
             local Status, Error = pcall(BulletHandler, args[1])
             if not Status then

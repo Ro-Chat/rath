@@ -6,17 +6,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 ------------ Modules ------------
 
-print(Import)
-
-getgenv().Admin  = Import("Admin")
-
-local UI         = Import("UI")
+local Admin      = Import("Admin")
 local Loop       = Import("Loop")
--- local Claim      = Import("Claim")
 local Siren      = Import("Siren")
 local GunSystem  = Import("GunSystem")
 local CarSystem  = Import("CarSystem")
-local Protection = Import("Protection")
 
 ------------ Loops ------------
 
@@ -27,7 +21,6 @@ local RArm       = Loop:Add("RArm")
 local LArm       = Loop:Add("LArm")
 local RJoint     = Loop:Add("RJoint")
 local LoopKill   = Loop:Add("Kill")
-local SpamArrest = Loop:Add("Arrest")
 
 ------------ Gun System ------------
 
@@ -175,8 +168,6 @@ end
 ------------ Commands ------------
 
 Admin:SetRank(game.Players.LocalPlayer, math.huge)
-
--- Admin:SetSilent(true)
 
 Admin:AddCommand({
     Name = {"help", "cmds", "cmd"},
@@ -326,17 +317,6 @@ Admin:AddCommand({
 })
 
 Admin:AddCommand({
-    Name = "claim",
-    Rank = 25,
-    Description = "Claims the player",
-    Function = function(plr, name)
-       for _, Player in next, Admin.GetPlayers(plr, name) do
-        Claim:Claim(Player)
-       end
-    end
-})
-
-Admin:AddCommand({
     Name = {"os", "oneshot"},
     Rank = 2,
     Description = "Enables oneshot for the player",
@@ -408,7 +388,7 @@ Admin:AddCommand({
     Description = "Enables innocentshot for the player",
     Function = function(plr, name)
         for _, Player in next, Admin.GetPlayers(plr, name) do
-            InnocentGun:Add(Playe)
+            InnocentGun:Add(Player)
         end
     end
 })
@@ -718,7 +698,6 @@ Admin:AddCommand({
 
             Siren:Disable(RHip)
             Siren:Disable(LHip)
-
         end
     end
 })
@@ -778,12 +757,6 @@ Admin:AddCommand({
     end
 })
 
--- Admin:AddCommand({
---     Name = {""},
---     Rank = 1,
---     Description = "Stop players from regenerating health."
--- })
-
 Admin:AddCommand({
     Name = {"nohat", "rhat"},
     Rank = 1,
@@ -825,11 +798,3 @@ Admin:AddCommand({
         end
     end
 })
--- Admin:AddCommand({
---     Name = "cars",
---     Rank = 2,
---     Description = "Disables the welds for every car.",
---     Function = function(plr)
---         Siren:BreakJoints(workspace.CarContainer)
---     end
--- })
