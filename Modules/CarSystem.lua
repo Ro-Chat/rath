@@ -20,10 +20,9 @@ local CarSystem = {
         self.Cars[Car] = nil
     end,
     CarDamageHandler = function(Data)
-        -- print(game:GetService("HttpService"):JSONEncode(Data))
         local Hit = Data.Hit
         local Gun = Data.Gun
-        -- print(Hit, Gun)
+        
         local GunStates = Gun and Gun:FindFirstChild("GunStates") and require(Gun.GunStates)
     
         if not Hit or not Gun then return end
@@ -64,13 +63,12 @@ for _, Car in next, CarContainer:GetChildren() do
         end,
         IdentifyPart = function(self, Part)
             local Main = self.Car.Body.Main
-            -- local Offset = Part.Position - Main.Position
 
             local Angle = math.deg(math.acos(Main.CFrame.LookVector.unit:Dot((Part.Position-Main.Position).unit)))
             local Offset = (Angle - 90)
+            
             Offset = math.ceil(Offset > 0 and Offset < 1 and Offset * 1000 or Offset)
-            -- Offset = Vector3.new(math.floor(Offset.X), math.floor(Offset.Y), math.floor(Offset.Z))
-            print(Offset)
+            
             if Offset == -20 then
                 return "LFTire"
             end
@@ -99,8 +97,6 @@ for _, Car in next, CarContainer:GetChildren() do
             end
 
             return "Base"
-            -- print(Part.Transparency, Angle, Offset)
-            
         end,
         GetPartFromAngle = function(self, Angle)
             local Main = self.Car.Body.Main
@@ -130,15 +126,11 @@ for _, Car in next, CarContainer:GetChildren() do
                     if Identifier == "Windshield" or Identifier == "RearWindow" then
                         for _, Angle in next, Angles do
                             local Part = self:GetPartFromAngle(Angle)
-                            -- if Part.Transparency > 0 then
-                                self:DisableWelds(Part)
-                            -- end
-                            -- print(Part)
+                            self:DisableWelds(Part)
                         end
                     else
                         self:DisableWelds(Hit)
                     end
-                    -- end
                     return
                 end
                 self:Destroy()
@@ -160,8 +152,6 @@ CarContainer.ChildAdded:Connect(function(Car)
     CarSystem.Cars[Car] = {
         Car = Car,
         Name = Car.Name,
-        -- Window = CarSystem.CarInfo[Car.Name].Window,
-        -- Tire = CarSystem.CarInfo[Car.Name].Tires,
         Health = {
             Base = CarSystem.CarInfo[Car.Name].Health,
             Windshield = CarSystem.CarInfo[Car.Name].Window,
@@ -177,7 +167,6 @@ CarContainer.ChildAdded:Connect(function(Car)
             for _, Weld in next, self.Car:GetDescendants() do
                 pcall(function()
                     if Weld:IsA("JointInstance") and (Weld.Part0 == Part or Weld.Part1 == Part) then
-                        -- print(Weld)
                         Siren:Disable(Weld)
                     end
                 end)
@@ -185,13 +174,12 @@ CarContainer.ChildAdded:Connect(function(Car)
         end,
         IdentifyPart = function(self, Part)
             local Main = self.Car.Body.Main
-            -- local Offset = Part.Position - Main.Position
 
             local Angle = math.deg(math.acos(Main.CFrame.LookVector.unit:Dot((Part.Position-Main.Position).unit)))
             local Offset = (Angle - 90)
+                
             Offset = math.ceil(Offset > 0 and Offset < 1 and Offset * 1000 or Offset)
-            -- Offset = Vector3.new(math.floor(Offset.X), math.floor(Offset.Y), math.floor(Offset.Z))
-            print(Offset)
+
             if Offset == -20 then
                 return "LFTire"
             end
@@ -220,8 +208,6 @@ CarContainer.ChildAdded:Connect(function(Car)
             end
 
             return "Base"
-            -- print(Part.Transparency, Angle, Offset)
-            
         end,
         GetPartFromAngle = function(self, Angle)
             local Main = self.Car.Body.Main
@@ -251,15 +237,11 @@ CarContainer.ChildAdded:Connect(function(Car)
                     if Identifier == "Windshield" or Identifier == "RearWindow" then
                         for _, Angle in next, Angles do
                             local Part = self:GetPartFromAngle(Angle)
-                            -- if Part.Transparency > 0 then
-                                self:DisableWelds(Part)
-                            -- end
-                            -- print(Part)
+                            self:DisableWelds(Part)
                         end
                     else
                         self:DisableWelds(Hit)
                     end
-                    -- end
                     return
                 end
                 self:Destroy()
@@ -274,10 +256,7 @@ CarContainer.ChildAdded:Connect(function(Car)
             CarSystem:Destroy(self.Car)
         end
     }
--- end)
 end)
-
--- Tire "pops" when they're shot
 
 function GetCarFromPart(part)
     for Car, Data in next, CarSystem.Cars do
@@ -286,9 +265,5 @@ function GetCarFromPart(part)
         end
     end
 end
-
-
-
--- Make the car break on car crashes
 
 return CarSystem
