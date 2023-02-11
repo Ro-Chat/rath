@@ -2,6 +2,9 @@
 This script is more of a way to get the toggleSiren remote into the public and shouldn't be used as a replacement to whatever script you might use.
 
 # Commands
+
+The prefix is `;`
+
 * help | cmds | cmd ?command
 * commandwhitelist | cw | givecommand player, command
 * gunban | gb player
