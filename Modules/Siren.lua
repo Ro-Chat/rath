@@ -8,12 +8,12 @@ local toggleSiren = Remote:WaitForChild("toggleSiren")
 local sirenToggleScript = toggleSiren:WaitForChild("sirenToggleScript")
 local Prison_ITEMS = workspace:WaitForChild("Prison_ITEMS")
 
+print("kill me")
+
 local sirenLib = {
     DisabledQueue = {},
     GetSound = function()
         Remote.ItemHandler:InvokeServer(Prison_ITEMS.giver.M9.ITEMPICKUP)
-        
-        print("kill me")
         
         repeat task.wait() until LocalPlayer.Backpack:FindFirstChild("M9") or LocalPlayer.Character:FindFirstChild("M9")
 
