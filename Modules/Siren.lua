@@ -200,19 +200,17 @@ end)
 local Locked = sirenLib:Lock(sirenToggleScript)
 
 if Locked and not ServerLocked then
-    StarterGui:SetCore("SendNotification",{
+    StarterGui:SetCore("SendNotification", {
         Title = "Server successfully locked!",
-        Text = "This server was successfully locked. The prefix is ";".",
+        Text = "This server was successfully locked." .. Import and "The prefix is \";\"",
     })
-    print("Server is locked, the script will execute.")
     coroutine.resume(sirenLib.DisableQueue)
     getgenv().ServerLocked = true
 elseif not Locked and sirenToggleScript.Enabled == false and not ServerLocked then
-    StarterGui:SetCore("SendNotification",{
+    StarterGui:SetCore("SendNotification", {
         Title = "Server is disabled!",
         Text = "This server is disabled, join a different server or crash this one.",
     })
-    print("Server is disabled, if you'd like to use this script find a different server or crash this one.")
 end
 
 return sirenLib
