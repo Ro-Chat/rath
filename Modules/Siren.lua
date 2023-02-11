@@ -8,8 +8,6 @@ local toggleSiren = Remote:WaitForChild("toggleSiren")
 local sirenToggleScript = toggleSiren:WaitForChild("sirenToggleScript")
 local Prison_ITEMS = workspace:WaitForChild("Prison_ITEMS")
 
-print("kill me")
-
 local sirenLib = {
     DisabledQueue = {},
     GetSound = function()
@@ -209,7 +207,7 @@ if Locked and not ServerLocked then
     coroutine.resume(sirenLib.DisableQueue)
     getgenv().ServerLocked = true
 elseif not Locked and sirenToggleScript.Enabled == false and not ServerLocked then
-    getgenv().ServerLocked
+    getgenv().ServerLocked = true
     StarterGui:SetCore("SendNotification", {
         Title = "Server is disabled!",
         Text = "This server is disabled, join a different server or crash this one.",
