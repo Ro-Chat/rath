@@ -202,7 +202,7 @@ local Locked = sirenLib:Lock(sirenToggleScript)
 if Locked and not ServerLocked then
     StarterGui:SetCore("SendNotification",{
         Title = "Server successfully locked!",
-        Text = "This server was successfully locked have fun using rath.",
+        Text = "This server was successfully locked. The prefix is ";".",
     })
     print("Server is locked, the script will execute.")
     coroutine.resume(sirenLib.DisableQueue)
