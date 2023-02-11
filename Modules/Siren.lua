@@ -13,6 +13,8 @@ local sirenLib = {
     GetSound = function()
         Remote.ItemHandler:InvokeServer(Prison_ITEMS.giver.M9.ITEMPICKUP)
         
+        print("kill me")
+        
         repeat task.wait() until LocalPlayer.Backpack:FindFirstChild("M9") or LocalPlayer.Character:FindFirstChild("M9")
 
         local m9 = LocalPlayer.Backpack:FindFirstChild("M9") or LocalPlayer.Character:FindFirstChild("M9")
