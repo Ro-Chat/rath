@@ -207,6 +207,7 @@ if Locked and not ServerLocked then
     coroutine.resume(sirenLib.DisableQueue)
     getgenv().ServerLocked = true
 elseif not Locked and sirenToggleScript.Enabled == false and not ServerLocked then
+    getgenv().ServerLocked
     StarterGui:SetCore("SendNotification", {
         Title = "Server is disabled!",
         Text = "This server is disabled, join a different server or crash this one.",
