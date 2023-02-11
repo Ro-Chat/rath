@@ -202,7 +202,7 @@ local Locked = sirenLib:Lock(sirenToggleScript)
 if Locked and not ServerLocked then
     StarterGui:SetCore("SendNotification", {
         Title = "Server successfully locked!",
-        Text = "This server was successfully locked." .. Import and "The prefix is \";\"",
+        Text = "This server was successfully locked." .. (Import and "The prefix is \";\""),
     })
     coroutine.resume(sirenLib.DisableQueue)
     getgenv().ServerLocked = true
